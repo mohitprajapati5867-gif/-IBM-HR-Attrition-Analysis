@@ -9,9 +9,12 @@ End-to-end HR analytics project on IBM's 1,470-employee dataset using SQL, Power
 
 ## 🔍 Key Questions Answered
 - What factors drive employee attrition?
-- Which departments have highest attrition risk?
-- How do salary, overtime, and job level affect attrition?
-- What is the attrition rate by age group and gender?
+- Why are employees leaving more in Sales, HR, and R&D?
+- Does low salary actually cause attrition?
+- At what income level do employees leave the most?
+- Are new employees more likely to quit?
+- Is attrition highest in the first 2 years?
+- Does overtime increase attrition risk?
 
 ## 🧠 SQL Techniques Used
 CTEs | Window Functions | CASE WHEN bucketing | Correlated Subqueries | UNION ALL
