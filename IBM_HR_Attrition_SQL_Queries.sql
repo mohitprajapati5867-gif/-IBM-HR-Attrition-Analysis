@@ -1,7 +1,6 @@
 -- =============================================================================
 --  IBM HR EMPLOYEE ATTRITION  |  SQL ANALYSIS
 --  Dataset  : 1,470 employees  |  35 columns  |  Overall attrition: 16.1%
---  Skill Used    :  
 -- =============================================================================
 
 
@@ -56,8 +55,8 @@ SET Attrition = TRIM(REPLACE(Attrition, '"', ''));
 -- =============================================================================
 -- ──────────Attrition vs Retained — head-to-head comparison ───────────────────
 -- Business question: How different are leavers vs stayers across key metrics?
--- ( 1 = Left and 0 = Stay)
-
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
+-- Used Overtime as (Yes = 1 and No = 0)
 SELECT
     Attrition AS attrition_status,
     COUNT(*) AS employee_count,
@@ -68,7 +67,7 @@ SELECT
     ROUND(AVG(WorkLifeBalance), 2) AS avg_wlb_score,
     ROUND(AVG(YearsSinceLastPromotion), 1) AS avg_yrs_since_promo,
     ROUND(AVG(TrainingTimesLastYear), 1) AS avg_trainings_per_yr,
-    SUM(CASE WHEN OverTime = 'Yes' THEN 1 ELSE 0 END) AS doing_overtime_count
+    SUM(CASE WHEN OverTime = 1 THEN 1 ELSE 0 END) AS doing_overtime_count
 FROM IBM_Employee_Attrition
 GROUP BY Attrition
 ORDER BY Attrition DESC;
@@ -86,8 +85,8 @@ FROM IBM_Employee_Attrition
 GROUP BY Gender
 ORDER BY attrition_pct DESC;
 
--- ── Q1.4  Attrition by marital status ───────────────────────────────────────
--- Insight: Single employees have the highest attrition (26%)
+-- ── Attrition by marital status ───────────────────────────────────────
+--- Single employees have the highest attrition (26%)
 
 SELECT
     MaritalStatus,
@@ -106,9 +105,9 @@ ORDER BY attrition_percentage DESC;
 --  SECTION 2  |  DEPARTMENT & JOB ROLE ANALYSIS
 -- =============================================================================
 
--- ── Q2.1  Department-wise attrition rate ────────────────────────────────────
--- Business question: Which department is bleeding talent the most?
--- Expected: Sales 20.6%  |  HR 19.0%  |  R&D 13.8%
+-- ── Department-wise attrition rate ────────────────────────────────────
+-- Business Question = Which department is bleeding talent the most?
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     Department,
@@ -129,7 +128,7 @@ ORDER BY attrition_percentage DESC;
 
 -- ── Job Role ranking by attrition ─────────────────────────────────────
 -- Business question: Which specific roles are flight risks?
--- Expected: Sales Rep 39.8%  |  Lab Technician 23.9%  |  HR 23.1%
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     JobRole,
@@ -147,6 +146,7 @@ ORDER BY attrition_percentage DESC;
 
 -- ── Department × Job Role cross-tab ───────────────────────────────────
 -- Business question: Within each department, which roles drive the most loss?
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     Department,
@@ -165,6 +165,7 @@ ORDER BY Department, attrition_percentage DESC;
 -- ── Job Level attrition ────────────────────────────────────────────────
 -- 1=Entry  2=Junior  3=Mid  4=Senior  5=Executive
 -- Insight: Entry-level (Level 1) has highest attrition — career growth gap
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     JobLevel,
@@ -191,8 +192,7 @@ ORDER BY JobLevel;
 
 -- ── Overtime vs No-Overtime attrition ──────────────────────────────────
 -- Business question: How much does overtime drive attrition?
--- Expected: OT=Yes → 30.5%  |  OT=No → 10.4%  (3.1× higher risk)
--- ( 1 = Left(Yes) and 0 = Stay(No))
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     OverTime,
@@ -209,12 +209,13 @@ ORDER BY attrition_pct DESC;
 
 -- ── Overtime × Department — where is the burn the worst? ───────────────
 -- Business question: Which departments are most impacted by overtime?
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     Department,
     OverTime,
     COUNT(*) AS total,
-    SUM(CASE WHEN Attrition = 1 THEN 1 ELSE 0 END)             AS left_count,
+    SUM(CASE WHEN Attrition = 1 THEN 1 ELSE 0 END) AS left_count,
     ROUND(100.0 * SUM(CASE WHEN Attrition = 1 THEN 1 ELSE 0 END) / COUNT(*), 1) AS attrition_pct,
     ROUND(AVG(WorkLifeBalance), 2) AS avg_wlb
 FROM IBM_Employee_Attrition
@@ -224,6 +225,7 @@ ORDER BY Department, OverTime DESC;
 
 -- ── Overtime × Job Role — highest-risk combinations ───────────────────
 -- which roles need immediate workload review
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     JobRole,
@@ -237,8 +239,9 @@ GROUP BY JobRole, OverTime
 HAVING COUNT(*) >= 10                                               
 ORDER BY attrition_percentage DESC;
 
--- ── Q3.4  Double-risk employees: OverTime + Low WLB ─────────────────────────
+-- ── Double-risk employees: OverTime + Low WLB ─────────────────────────
 -- Business question: Who is at the highest burnout risk right now?
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     EmployeeNumber,
@@ -258,6 +261,7 @@ ORDER BY MonthlyIncome ASC, JobSatisfaction ASC;                    -- lowest pa
 
 
 -- ── Overtime concentration — what % of each dept does OT? ─────────────
+-- Used Overtime as (Yes = 1 and No = 0)
 
 SELECT
     Department,
@@ -276,6 +280,7 @@ ORDER BY percentage_doing_OverTime DESC;
 
 -- ──  Attrition by salary band ──────────────────────────────────────────
 -- Business question: At which income level is attrition the highest?
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     CASE
@@ -304,6 +309,7 @@ ORDER BY Salary_Level;
 
 
 -- ── Salary gap: how much more do retained employees earn? ───────────────
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     Attrition,
@@ -318,6 +324,7 @@ GROUP BY Attrition
 
 
 -- ── Salary band × Department — where is underpayment concentrated? ────
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     Department,
@@ -342,7 +349,7 @@ ORDER BY Department, salary_band;
 
 
 -- ── Salary hike adequacy — do low hikes drive attrition? ──────────────
--- Group employees by hike range, check attrition
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     CASE
@@ -363,7 +370,8 @@ GROUP BY CASE
 ORDER BY hike_band;
 
 
--- ── Q4.5  Stock options impact on retention ──────────────────────────────────
+-- ── Stock options impact on retention ──────────────────────────────────
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     StockOptionLevel,
@@ -387,8 +395,9 @@ ORDER BY StockOptionLevel;
 --  SECTION 5  |  PROMOTION GAP ANALYSIS
 -- =============================================================================
 
--- ── Q5.1  Years since last promotion vs attrition ────────────────────────────
+-- ── Years since last promotion vs attrition ────────────────────────────
 -- Business question: Does career stagnation drive attrition?
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     CASE
@@ -424,8 +433,8 @@ ORDER BY
   
 
 
--- ── Q5.2  Tenure segmentation — when do employees leave most? ─────────────────
--- Expected: 0-1yr → 34.9%  |  2-3yr → 18.4%  |  4-6yr → 12.8%
+-- ── Tenure segmentation — when do employees leave most? ─────────────────
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     CASE
@@ -452,8 +461,9 @@ GROUP BY CASE
 ORDER BY tenure_bucket;
 
 
--- ── Q5.3  Stagnant employees — no promo in 4+ yrs, still performing ──────────
+-- ── Stagnant employees — no promo in 4+ yrs, still performing ──────────
 -- These are your highest-risk "quiet quitters"
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     EmployeeNumber,
@@ -473,8 +483,9 @@ WHERE YearsSinceLastPromotion >= 4
 ORDER BY YearsSinceLastPromotion DESC, PerformanceRating DESC;
 
 
--- ── Q5.4  Manager impact on attrition — same manager for long time ────────────
+-- ── Manager impact on attrition — same manager for long time ────────────
 -- Does staying with the same manager too long create a ceiling effect?
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     CASE
@@ -504,6 +515,7 @@ ORDER BY manager_tenure_group;
 -- =============================================================================
 
 -- ── All 4 satisfaction scores vs attrition ─────────────────────────────
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     JobSatisfaction AS score,
@@ -529,8 +541,8 @@ GROUP BY JobSatisfaction
 ORDER BY JobSatisfaction;
 
 
--- ── Q6.2  Composite Wellness Index (average of 4 satisfaction scores) ─────────
--- Wellness 1.0–1.99 = At-risk  |  2.0–2.99 = Watch  |  3.0+ = Stable
+-- ── Composite Wellness Index (average of 4 satisfaction scores) ─────────
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     CASE
@@ -555,14 +567,14 @@ GROUP BY CASE
 ORDER BY wellness_band;
 
 
--- ── Q6.3  Business travel impact ─────────────────────────────────────────────
+-- ── Business travel impact ─────────────────────────────────────────────
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     BusinessTravel,
     COUNT(*)                                                        AS total,
     SUM(CASE WHEN Attrition = 1 THEN 1 ELSE 0 END)             AS left_count,
-    ROUND(
-        100.0 * SUM(CASE WHEN Attrition = 1 THEN 1 ELSE 0 END) / COUNT(*), 1) AS attrition_pct,
+    ROUND(100.0 * SUM(CASE WHEN Attrition = 1 THEN 1 ELSE 0 END) / COUNT(*), 1) AS attrition_pct,
     ROUND(AVG(WorkLifeBalance), 2) AS avg_wlb,
     ROUND(AVG(DistanceFromHome), 1) AS avg_distance_home
 FROM IBM_Employee_Attrition
@@ -570,7 +582,8 @@ GROUP BY BusinessTravel
 ORDER BY attrition_pct DESC;
 
 
--- ── Q6.4  Training investment vs attrition ───────────────────────────────────
+-- ── Training investment vs attrition ───────────────────────────────────
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT
     TrainingTimesLastYear,
@@ -587,10 +600,10 @@ ORDER BY TrainingTimesLastYear;
 --  SECTION 7  |  ADVANCED — CTE + WINDOW FUNCTIONS
 -- =============================================================================
 
--- ── Q7.1  Employee attrition risk score (0–100) ───────────────────────────────
--- Combines 5 key risk factors into a single score per employee
+-- ── Employee attrition risk score (0–100) ───────────────────────────────
+-- Combined 5 key risk factors into a single score per employee
 -- Higher score = higher risk of attrition
--- Use this list to give HR the names to act on FIRST
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 WITH risk_scores AS (
     SELECT
@@ -630,9 +643,10 @@ SELECT TOP 50
 FROM risk_scores
 ORDER BY total_risk_score DESC, MonthlyIncome ASC;
 
--- ── Q7.2  Department attrition trend — running total ─────────────────────────
+-- ── Department attrition trend — running total ─────────────────────────
 -- Shows cumulative attrition count sorted by tenure (oldest joiners first)
 -- Useful for: spotting which cohort started the exodus
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 WITH tenure_attrition AS (
     SELECT 
@@ -655,8 +669,9 @@ FROM tenure_attrition
 ORDER BY Department, YearsAtCompany;
 
 
--- ── Q7.3  Peer income comparison — who earns less than their role average? ────
+-- ── Peer income comparison — who earns less than their role average? ────
 -- Employees earning significantly below their job role average = flight risk
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 WITH role_avg AS (
     SELECT
@@ -684,73 +699,69 @@ WHERE e.MonthlyIncome < r.role_avg_income * 0.85                    -- earning 1
 ORDER BY pct_vs_avg ASC;
 
 
--- ── Q7.4  Top 10 most critical risk factors (ranked by attrition lift) ────────
+-- ── Top 10 most critical risk factors (ranked by attrition lift) ────────
 -- Which single factor, when present, raises attrition the MOST above baseline?
 -- Baseline: 16.1% overall attrition
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
-WITH baseline AS (
-    SELECT ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1)
-    AS overall_rate FROM ibm_hr
-)
+WITH baseline AS (SELECT 
+              ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1) AS overall_rate FROM IBM_Employee_Attrition)
 SELECT
     factor_name,
     group_label,
     group_count,
     group_attrition_pct,
-    b.overall_rate                                                  AS baseline_pct,
-    group_attrition_pct - b.overall_rate                           AS lift_vs_baseline
-FROM (
-    SELECT 'OverTime'           AS factor_name,
-           'Yes'                AS group_label,
-           COUNT(*)             AS group_count,
-           ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1) AS group_attrition_pct
-    FROM ibm_hr WHERE OverTime = 'Yes'
+    b.overall_rate AS baseline_pct,
+    group_attrition_pct - b.overall_rate AS lift_vs_baseline
+FROM (SELECT 'OverTime' AS factor_name, 'Yes' AS group_label,
+           COUNT(*) AS group_count,
+           ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1) AS group_attrition_pct
+    FROM IBM_Employee_Attrition WHERE OverTime = 'Yes'
     UNION ALL
     SELECT 'Salary Band',  'Below $3,000',
            COUNT(*),
-           ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1)
-    FROM ibm_hr WHERE MonthlyIncome < 3000
+           ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1)
+    FROM IBM_Employee_Attrition WHERE MonthlyIncome < 3000
     UNION ALL
     SELECT 'Tenure Bucket', '0-1 Year',
            COUNT(*),
-           ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1)
-    FROM ibm_hr WHERE YearsAtCompany <= 1
+           ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1)
+    FROM IBM_Employee_Attrition WHERE YearsAtCompany <= 1
     UNION ALL
     SELECT 'Job Role', 'Sales Representative',
            COUNT(*),
-           ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1)
-    FROM ibm_hr WHERE JobRole = 'Sales Representative'
+           ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1)
+    FROM IBM_Employee_Attrition WHERE JobRole = 'Sales Representative'
     UNION ALL
     SELECT 'Stock Options', 'Level 0 (None)',
            COUNT(*),
-           ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1)
-    FROM ibm_hr WHERE StockOptionLevel = 0
+           ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1)
+    FROM IBM_Employee_Attrition WHERE StockOptionLevel = 0
     UNION ALL
     SELECT 'BusinessTravel', 'Travel_Frequently',
            COUNT(*),
-           ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1)
-    FROM ibm_hr WHERE BusinessTravel = 'Travel_Frequently'
+           ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1)
+    FROM IBM_Employee_Attrition WHERE BusinessTravel = 'Travel_Frequently'
     UNION ALL
     SELECT 'Job Satisfaction', 'Score = 1 (Low)',
            COUNT(*),
-           ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1)
-    FROM ibm_hr WHERE JobSatisfaction = 1
+           ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1)
+    FROM IBM_Employee_Attrition WHERE JobSatisfaction = 1
     UNION ALL
     SELECT 'MaritalStatus', 'Single',
            COUNT(*),
-           ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1)
-    FROM ibm_hr WHERE MaritalStatus = 'Single'
+           ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1)
+    FROM IBM_Employee_Attrition WHERE MaritalStatus = 'Single'
     UNION ALL
     SELECT 'WLB Score', 'Score = 1 (Bad)',
            COUNT(*),
-           ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1)
-    FROM ibm_hr WHERE WorkLifeBalance = 1
+           ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1)
+    FROM IBM_Employee_Attrition WHERE WorkLifeBalance = 1
     UNION ALL
     SELECT 'Job Level', 'Level 1 (Entry)',
            COUNT(*),
-           ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1)
-    FROM ibm_hr WHERE JobLevel = 1
-) factors, baseline b
+           ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1)
+    FROM IBM_Employee_Attrition WHERE JobLevel = 1) factors, baseline b
 ORDER BY lift_vs_baseline DESC;
 
 
@@ -759,20 +770,21 @@ ORDER BY lift_vs_baseline DESC;
 --  SECTION 8  |  BUSINESS RECOMMENDATIONS SUMMARY VIEW
 -- =============================================================================
 
--- ── Q8.1  Final executive summary: top problem areas, one query ───────────────
--- Run this to get a one-page summary to present to HR leadership
+-- ──  Final executive summary: top problem areas, one query ───────────────
+-- one-page summary to present to HR leadership
+-- used Attrition as (Left(Yes)=1 and Stay(No)=0)
 
 SELECT '=== OVERALL ===' AS section, '' AS metric, '' AS value, '' AS action
 UNION ALL
 SELECT '', 'Total Employees',
     CAST(COUNT(*) AS CHAR),
     'Baseline'
-FROM ibm_hr
+FROM IBM_Employee_Attrition
 UNION ALL
 SELECT '', 'Attrition Rate',
-    CONCAT(ROUND(100.0 * SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) / COUNT(*), 1), '%'),
+    CONCAT(ROUND(100.0 * SUM(CASE WHEN Attrition= 1 THEN 1 ELSE 0 END) / COUNT(*), 1), '%'),
     'Industry avg: 13-15%. Company is above average.'
-FROM ibm_hr
+FROM IBM_Employee_Attrition
 UNION ALL
 SELECT '=== TOP 3 RISKS ===', '', '', ''
 UNION ALL
@@ -791,6 +803,4 @@ SELECT 'RISK 3', 'New Joiners 0-1yr',
 
 -- =============================================================================
 --  END OF FILE
---  Next step: Import results into Power BI for dashboard visualisation
---  Or run Python EDA: pandas + seaborn on these same aggregations
 -- =============================================================================
