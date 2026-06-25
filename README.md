@@ -31,7 +31,6 @@ CTEs | Window Functions | CASE WHEN bucketing | Correlated Subqueries | UNION AL
 |------|-------------|
 | `attrition_analysis.sql` | Complete SQL analysis |
 | `IBM_HR_Dashboard.pbix` | Power BI file |
-| `attrition_analysis.ipynb` | Python EDA notebook |
 
 ## 📌 Dataset
 [IBM HR Analytics Dataset](https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset) — 1,470 employees, 35 features
