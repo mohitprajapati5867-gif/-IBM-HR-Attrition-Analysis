@@ -5,8 +5,7 @@ End-to-end HR analytics project on IBM's 1,470-employee dataset using SQL, Power
 ## 🛠️ Tools Used
 - SQL Server Management Studio (SSMS) — advanced querying
 - Power BI — 5-page interactive dashboard
-- Excel — pivot tables & KPI summary
-- Python (pandas, matplotlib) — EDA & visualization
+- Excel — cleaning the data & KPI summary
 
 ## 🔍 Key Questions Answered
 - What factors drive employee attrition?
