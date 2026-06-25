@@ -1,6 +1,6 @@
 # IBM HR Attrition Analysis — Multi-Tool Project
 
-End-to-end HR analytics project on IBM's 1,470-employee dataset using SQL, Power BI, Excel, and Python.
+End-to-end HR analytics project on IBM's 1,470-employee dataset using SQL, Power BI, and Excel.
 
 ## 🛠️ Tools Used
 - SQL Server Management Studio (SSMS) — advanced querying
